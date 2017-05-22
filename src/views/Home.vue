@@ -40,7 +40,7 @@
     </div>
     <audio :src="songUrl"></audio>
     <footer v-if="current.index || current.index === 0" class="footer" ref="footer">
-      <div class="music-info">
+      <router-link tag="div" class="music-info" to="/music">
         <div class="avatar">
           <img :src="current.image" alt="">
         </div>
@@ -48,7 +48,7 @@
           <div class="song-name">{{current.name}}</div>
           <div class="singer">{{current.singer}}</div>
         </div>
-      </div>
+      </router-link>
       <div class="music-option">
         <i
           class="fa fa-backward button prev"
@@ -60,7 +60,7 @@
           aria-hidden="true"
           @touchstart="next"></i>
       </div>
-      <div class="progress" ref="progress"></div>
+      <div class="progress" ref="progress" :style="{width: current.percent * w + 'px'}"></div>
     </footer>
   </div>
 </template>
@@ -69,32 +69,39 @@
   // import jsonp from 'jsonp'
   // import $ from 'jquery'
   // import getSingle from './utils/singleton.js'
-  import JAudio from './utils/audio.js'
+  // import JAudio from './utils/audio.js'
   import songlist from './songList.js'
-  import {mapGetters, mapActions} from 'vuex'
+  // import {mapGetters, mapActions} from 'vuex'
+  import playerMixin from './utils/player-mixin.js'
   export default {
+    mixins: [playerMixin],
     data () {
       return {
         list: [],
         songUrl: '',
-        jaudio: null,
-        songStatus: 'stop',
+        // songStatus: 'stop',
         touchStartIndex: null,
         touchStartPos: {
           x: null,
           y: null
-        }
+        },
+        w: document.documentElement.clientWidth
       }
     },
     computed: {
-      ...mapGetters({
-        current: 'song'
-      })
+      // ...mapGetters({
+      //   current: 'song',
+      //   'RAudio'
+      // }),
+      // songStatus () {
+      //   return this.current.state || 'stop'
+      // }
     },
     methods: {
-      ...mapActions([
-        'setSong'
-      ]),
+      // ...mapActions([
+      //   'setSong',
+      //   'setRAudio'
+      // ]),
       fetchSongList () {
         this.list = songlist.songlist
         // axios.get('/static/data/songList.json')
@@ -113,13 +120,13 @@
         }
         return no
       },
-      countTime (seconds) {
-        let minutes = Math.floor(seconds / 60)
-        seconds %= 60
-        if (seconds < 10) seconds = '0' + seconds
-        if (minutes < 10) minutes = '0' + minutes
-        return `${minutes}:${seconds}`
-      },
+      // countTime (seconds) {
+      //   let minutes = Math.floor(seconds / 60)
+      //   seconds %= 60
+      //   if (seconds < 10) seconds = '0' + seconds
+      //   if (minutes < 10) minutes = '0' + minutes
+      //   return `${minutes}:${seconds}`
+      // },
       selectSongStart (e, i) {
         this.touchStartIndex = i
         this.touchStartPos.x = e.changedTouches[0].clientX
@@ -150,88 +157,106 @@
         console.log(clientX, clientY)
         console.log(startX, startY)
         if ((clientX === startX) && (clientY === startY)) {
+          if (this.$refs.progress) {
+            this.$refs.progress.style.width = '0px'
+          }
           this.setCurrentSong(this.touchStartIndex)
         }
-      },
-      setCurrentSong (i) {
-        let song = this.list[i]
-        let l = this.list.length
-        let imageUrl = `http://imgcache.qq.com/music/photo/album_300/${song.albumId % 100}/300_albumpic_${song.albumId}_0.jpg`
-        let currentSong = {
-          id: song.id,
-          index: i,
-          prev: i - 1 < 0 ? (l - 1) : (i - 1),
-          next: i + 1 >= l ? 0 : (i + 1),
-          name: song.songName,
-          singer: song.singerName,
-          image: imageUrl
-        }
-        this.setSong(currentSong)
-        this.playSong(currentSong)
-      },
-      playSong (song) {
-        console.log(song)
-        if (!this.jaudio) {
-          this.jaudio = new JAudio(`/wsmusic/${song.id}.m4a?fromtag=46`, this.progressHandler)
-        } else {
-          this.jaudio.url = `/wsmusic/${song.id}.m4a?fromtag=46`
-        }
-        this.jaudio.play()
-          .then(() => {
-            this.songStatus = 'run'
-          })
-          .catch(() => {
-            this.next()
-          })
-      },
-      next () {
-        this.$refs.progress.style.width = '0px'
-        this.songStatus = 'stop'
-        let current = this.current
-        this.setCurrentSong(current.next)
-      },
-      prev () {
-        this.$refs.progress.style.width = '0px'
-        this.songStatus = 'stop'
-        let current = this.current
-        this.setCurrentSong(current.prev)
-      },
-      play () {
-        let songStatus = this.songStatus
-        console.log(songStatus)
-        switch (songStatus) {
-          case 'run':
-            this.jaudio.pause()
-            this.songStatus = 'stop'
-            break
-          case 'stop':
-            this.jaudio.start()
-            this.songStatus = 'run'
-            break
-        }
-      },
-      pause () {
-        this.jaudio.stop()
-      },
-      progressHandler (percent) {
-        console.log(percent)
-        let width = this.$refs.footer.clientWidth
-        this.$refs.progress.style.width = width * percent + 'px'
-        console.log(percent)
-        if (percent >= 1) {
-          this.$refs.progress.style.width = '0px'
-          this.songStatus = 'stop'
-        }
-        // if (percent >= 1) {
-        //   this.$refs.progress.style.width = '0px'
-        //   this.next()
-        // }
       }
+      // setCurrentSong (i) {
+      //   let song = this.list[i]
+      //   let l = this.list.length
+      //   let imageUrl = `http://imgcache.qq.com/music/photo/album_300/${song.albumId % 100}/300_albumpic_${song.albumId}_0.jpg`
+      //   let currentSong = {
+      //     id: song.id,
+      //     index: i,
+      //     prev: i - 1 < 0 ? (l - 1) : (i - 1),
+      //     next: i + 1 >= l ? 0 : (i + 1),
+      //     name: song.songName,
+      //     singer: song.singerName,
+      //     image: imageUrl,
+      //     state: 'stop',
+      //     percent: 0,
+      //     ctime: 0,
+      //     playtime: song.playtime
+      //   }
+      //   this.setSong(currentSong)
+      //   this.playSong(currentSong)
+      // },
+      // playSong (song) {
+      //   if (!this.RAudio) {
+      //     let jaudio = new JAudio(`/wsmusic/${song.id}.m4a?fromtag=46`, this.progressHandler)
+      //     this.setRAudio(jaudio)
+      //   } else {
+      //     this.RAudio.url = `/wsmusic/${song.id}.m4a?fromtag=46`
+      //     this.setRAudio(this.RAudio)
+      //   }
+      //   this.RAudio.play()
+      //     .then(() => {
+      //       // this.songStatus = 'run'
+      //       this.current.state = 'run'
+      //       this.setSong(this.current)
+      //     })
+      //     .catch(() => {
+      //       this.next()
+      //     })
+      // },
+      // next () {
+      //   // this.$refs.progress.style.width = '0px'
+      //   let current = this.current
+      //   this.setCurrentSong(current.next)
+      // },
+      // prev () {
+      //   // this.$refs.progress.style.width = '0px'
+      //   let current = this.current
+      //   this.setCurrentSong(current.prev)
+      // },
+      // play () {
+      //   let songStatus = this.songStatus
+      //   switch (songStatus) {
+      //     case 'run':
+      //       this.RAudio.pause()
+      //       // this.songStatus = 'stop'
+      //       this.current.state = 'stop'
+      //       break
+      //     case 'stop':
+      //       this.RAudio.start()
+      //       // this.songStatus = 'run'
+      //       this.current.state = 'run'
+      //       break
+      //   }
+      //   this.setSong(this.current)
+      // },
+      // pause () {
+      //   this.RAudio.stop()
+      // },
+      // progressHandler (percent, ctime) {
+      //   this.current.ctime = Math.floor(ctime)
+      //   // let width = this.$refs.footer.clientWidth
+      //   // this.$refs.progress.style.width = width * percent + 'px'
+      //   this.current.percent = percent
+      //   this.setSong(this.current)
+      //   // let cobj = Object.assign({percent: percent}, this.current)
+      //   // this.setSong(cobj)
+      //   if (percent >= 1) {
+      //     this.current.percent = 0
+      //     this.setSong(this.current)
+      //     // this.$refs.progress.style.width = '0px'
+      //     // this.songStatus = 'stop'
+      //     this.next()
+      //   }
+      //   // if (percent >= 1) {
+      //   //   this.$refs.progress.style.width = '0px'
+      //   //   this.next()
+      //   // }
+      // }
     },
     created () {
-      console.log(songlist)
-      console.log(this.current)
       this.fetchSongList()
+      if (this.RAudio) {
+        this.RAudio.progresshandler = this.progressHandler
+        this.setRAudio(this.RAudio)
+      }
     }
   }
 </script>

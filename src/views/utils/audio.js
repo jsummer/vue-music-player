@@ -39,6 +39,9 @@ export default class JAudio {
     })
   }
   play () {
+    if (this.timer) {
+      cancelAnimationFrame(this.timer)
+    }
     if (this.source && this.source.buffer) {
       this.stop()
     }
@@ -50,7 +53,7 @@ export default class JAudio {
         .then((buffer) => {
           source.buffer = buffer
           source.connect(context.destination)
-          source.start(0, 210)
+          source.start(0, 200)
           this.startTime = context.currentTime
           this.updatePosition()
           // source.onended = () => {
@@ -77,7 +80,7 @@ export default class JAudio {
   }
   updatePosition () {
     let currentTime = this.context.currentTime - this.startTime
-    let duration = this.source.buffer.duration - 210
+    let duration = this.source.buffer.duration - 200
     let state = this.context.state
     let percent
     switch (state) {
@@ -89,11 +92,9 @@ export default class JAudio {
         percent = this.percent
         break
     }
-    // console.log(this.progresshandler)
-    this.progresshandler(percent)
+    this.progresshandler(percent, currentTime)
     this.timer = requestAnimationFrame(this.updatePosition.bind(this))
     if (percent >= 1) {
-      console.log(1111)
       cancelAnimationFrame(this.timer)
     }
   }

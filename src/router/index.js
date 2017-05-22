@@ -13,7 +13,7 @@ export default new Router({
       component: Home
     },
     {
-      path: 'music/:id',
+      path: '/music',
       name: 'music',
       component: Music
     }
