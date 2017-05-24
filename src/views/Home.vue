@@ -1,6 +1,7 @@
 <template>
   <div>
     <header class="header">
+     <!-- <audio ref="audio" src="https://audio.xmcdn.com/group26/M07/C2/30/wKgJWFkZI2eQQt5xAKLXrs5LlLA084.m4a" autoplay controls></audio> -->
       <div class="blum-wrap">
         <div class="left">
           <div class="blum-avatar">

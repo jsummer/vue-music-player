@@ -1,5 +1,5 @@
 import {mapGetters, mapActions} from 'vuex'
-import JAudio from './audio.js'
+import JAudio from './audio2.js'
 
 const playerMixin = {
   computed: {
@@ -49,6 +49,7 @@ const playerMixin = {
         let jaudio = new JAudio(`/wsmusic/${song.id}.m4a?fromtag=46`, this.progressHandler)
         this.setRAudio(jaudio)
       } else {
+        this.RAudio.position = null
         this.RAudio.url = `/wsmusic/${song.id}.m4a?fromtag=46`
         this.setRAudio(this.RAudio)
       }

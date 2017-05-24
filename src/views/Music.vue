@@ -36,7 +36,15 @@
           <div class="end-time">
             {{countTime(current.playtime)}}
           </div>
-          <div class="progress-cursor" :style="{width: w * current.percent + 'px'}"></div>
+          <div class="progress-cursor" :style="{width: w * current.percent + 'px'}">
+            <div
+              class="cursor"
+              ref="cursor"
+              @touchstart="cursorStart"
+              @touchmove="cursorMove"
+              @touchend="cursorEnd"
+              ></div>
+          </div>
         </div>
       </div>
     </div>
@@ -52,7 +60,11 @@
     data () {
       return {
         list: songlist.songlist,
-        w: document.documentElement.clientWidth - 14
+        w: document.documentElement.clientWidth - 56,
+        startPos: {
+          x: null,
+          y: null
+        }
       }
     },
     computed: {
@@ -65,6 +77,34 @@
       // }
     },
     methods: {
+      cursorStart (e) {
+        console.log(1)
+        let pos = e.changedTouches[0]
+        this.startPos = {
+          x: pos.clientX,
+          y: pos.clientY
+        }
+        this.RAudio.stopTimer()
+      },
+      cursorMove (e) {
+        let pos = e.changedTouches[0]
+        // let startPos = this.startPos
+        let left = this.$refs.progress.offsetLeft
+        let percent
+        if (pos.clientX <= left) {
+          percent = 0
+        } else if (pos.clientX >= this.w + left) {
+          percent = 1
+        } else {
+          percent = (pos.clientX - left) / this.w
+        }
+        this.current.percent = percent
+        this.setSong(this.current)
+      },
+      cursorEnd () {
+        console.log(this.current.percent)
+        this.RAudio.dragPlay(this.current.percent)
+      }
       // ...mapActions(['setSong', 'setRAudio']),
       // setCurrentSong (i) {
       //   console.log(this.list)
@@ -198,7 +238,7 @@
     .progress{
       position: absolute;
       top: 0;
-      left: 7px;
+      left: 28px;
       height: 3px;
       width: 100%;
       background-color: #e3eaf5;
@@ -218,8 +258,7 @@
       width: 0;
       height: 100%;
       background-color: #7daffd;
-      &::after{
-        content: '';
+      .cursor{
         position: absolute;
         width: 14px;
         height: 14px;

@@ -59,6 +59,13 @@ module.exports = {
         pathRewrite: {
           '^/imagemusic': '/imagemusic'
         }
+      },
+      '/ximalaya': {
+        target: 'http://audio.xmcdn.com',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/ximalaya': '/ximalaya'
+        }
       }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
