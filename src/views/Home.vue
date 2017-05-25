@@ -1,19 +1,24 @@
 <template>
   <div>
     <header class="header">
-     <!-- <audio ref="audio" src="https://audio.xmcdn.com/group26/M07/C2/30/wKgJWFkZI2eQQt5xAKLXrs5LlLA084.m4a" autoplay controls></audio> -->
+      <div class="bg" v-if="current.index || current.index === 0" :style="{backgroundImage: 'url(' + current.image + ')'}"></div>
+      <div v-else class="subject">用<i class="fa fa-heart" aria-hidden="true"></i>听音乐</div>
       <div class="blum-wrap">
         <div class="left">
           <div class="blum-avatar">
-            <img src="" alt="">
+            <img src="/static/icon/avatar.jpg" alt="">
           </div>
           <div class="blum-info">
-            <div class="blum-name"></div>
-            <div class="blum-other"></div>
+            <div class="blum-name">夏天吃西瓜 - 呓语</div>
+            <div class="blum-other">
+              <div class="song-number">歌曲 100</div>
+              <div class="like-number"><i class="fa fa-heart-o" aria-hidden="true"></i>666</div>
+            </div>
           </div>
         </div>
         <div class="right">
           <div class="options">
+            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
           </div>
         </div>
       </div>
@@ -267,7 +272,12 @@
     top: 0;
     width: 100%;
     height: 35vh;
-    background-color: #ff0;
+    background-color: #f5f5f5;
+    .bg{
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+    }
     .blum-wrap{
       height: 78px;
       position: absolute;
@@ -277,6 +287,56 @@
       background-color: #fff;
       z-index: 100;
       border-radius: 2vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4vw;
+      .left{
+        display: flex;
+        align-items: center;
+      }
+      .options{
+        i{
+          font-size: 18px;
+          color: #7690c2;
+        }
+      }
+    }
+    .blum-info{
+      font-size: 13px;
+      line-height: 1.6;
+      margin-left: 2vw;
+    }
+    .blum-other{
+      display: flex;
+      color: #c4cfe5;
+      font-size: 12px;
+    }
+    .blum-name{
+      color: #889ac0;
+    }
+    .blum-avatar{
+      width: 48px;
+      height: 48px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      border-radius: 50%;
+      background-color: #d7ddeb;
+      img{
+        max-width: 100%;
+        max-height: 100%;
+        /* max-height: 100%; */
+      }
+    }
+    .song-number{
+      margin-right: 5vw;
+    }
+    .like-number{
+      i{
+        margin-right: 2vw;
+      }
     }
   }
   .song-list-container{
@@ -355,6 +415,15 @@
       font-size: 39px;
     }
     &.next{
+    }
+  }
+  .subject{
+    margin: 10vh 0 0 0;
+    text-align: center;
+    font-size: 18px;
+    i{
+      margin: 0 4vw;
+      color: #f00;
     }
   }
 </style>

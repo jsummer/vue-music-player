@@ -46,11 +46,11 @@ const playerMixin = {
     },
     playSong (song) {
       if (!this.RAudio) {
-        let jaudio = new JAudio(`/wsmusic/${song.id}.m4a?fromtag=46`, this.progressHandler)
+        let jaudio = new JAudio(`http://ws.stream.qqmusic.qq.com/${song.id}.m4a?fromtag=46`, this.progressHandler)
         this.setRAudio(jaudio)
       } else {
         this.RAudio.position = null
-        this.RAudio.url = `/wsmusic/${song.id}.m4a?fromtag=46`
+        this.RAudio.url = `http://ws.stream.qqmusic.qq.com/${song.id}.m4a?fromtag=46`
         this.setRAudio(this.RAudio)
       }
       this.RAudio.play()
